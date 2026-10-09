@@ -1,5 +1,5 @@
 /* The $25K Climb — service worker: app shell offline, API always live */
-const CACHE = 'climb-shell-v1';
+const CACHE = 'climb-shell-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
