@@ -727,7 +727,6 @@ function buildAll(){
   const g = state.goalEff; const gk = g % 1000 === 0 ? (g/1000)+'K' : (g/1000).toFixed(1)+'K';
   $('#wordmark').innerHTML = 'The <em>$'+gk+'</em> Climb';
   $('#goal-txt').textContent = money(g);
-  $('#year-sub').textContent = 'Day 1 is ' + fmtMDY(startDate) + '. Summit Day is ' + fmtMDY(addDays(startDate, 364)) + '. Each level is a month long, and the base rate steps up at every Base Camp.';
   const t = dayIndexOf(todayMid()); const cur = t < 1 ? 1 : t > 365 ? 12 : plan[t-1].level;
   document.querySelectorAll('details.level').forEach(el => { el.open = (+el.dataset.level === cur); });
   refresh();
@@ -857,7 +856,8 @@ function refresh(){
   $('#nav-climb-s').textContent = 'Level ' + curL + ' · ' + curLevel.name + ' · ' + perLevel[curL-1].sc + ' of ' + curLevel.days.length + ' days';
   const doneLevels = perLevel.filter(p => p.sc > 0 && levels[perLevel.indexOf(p)].days.length === p.sc).length;
   $('#nav-year-s').textContent = (inRange ? 'Level ' + curL + ' of 12' : idx < 1 ? 'Starts ' + fmtMD(startDate) : 'Year complete') + ' · ' + doneLevels + ' level' + (doneLevels===1?'':'s') + ' done';
-  $('#year-title').textContent = inRange ? 'Level ' + curL + ' of 12 · ' + curLevel.name : 'Twelve levels to the summit';
+  $('#year-title').textContent = inRange ? 'Level ' + curL + ' of 12' : 'Twelve levels to the summit';
+  $('#year-sub').textContent = (inRange ? 'You are in ' + curLevel.name + '. ' : '') + 'Day 1 is ' + fmtMDY(startDate) + '. Summit Day is ' + fmtMDY(addDays(startDate, 364)) + '. Each level is a month long, and the base rate steps up at every Base Camp.';
 
   // altimeter
   let nextMarked = false, nextM = null;
