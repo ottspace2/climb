@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base target="_top">
+<meta name="theme-color" content="#121C2A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Climb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>The $25K Climb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+[hidden]{display:none!important} img{max-width:100%}
+#gate .bform{grid-template-columns:1fr auto}
+#gate .bform button{grid-column:auto}
+.install-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.install-row .sub{flex:1;min-width:200px}
+
+/* Layout: one 760px column — mountain hero, then the daily ritual cards; alpine trail-sign typography */
+:root{
+  --bg:#EDF1F5; --surface:#FFFFFF; --surface-2:#F5F7FA; --ink:#121C2A; --muted:#5B6979; --line:#D4DCE5;
+  --a:#DE5733; --b:#2474C0; --both:#7651CC; --on-fill:#FFFFFF;
+  --gold:#C9920F; --gold-soft:#FAF0D2; --good:#1E8F5C; --bad:#C23E2C;
+  --display:'Barlow Condensed','Arial Narrow',Impact,sans-serif; --body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:12px; --shadow:0 1px 2px rgba(18,28,42,.06),0 8px 24px -12px rgba(18,28,42,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C131C; --surface:#151F2B; --surface-2:#1B2735; --ink:#EDF2F8; --muted:#96A4B4; --line:#283645;
+    --a:#FF7B58; --b:#55A6EA; --both:#AB8DEC; --on-fill:#0C131C;
+    --gold:#F0B73A; --gold-soft:#2C2712; --good:#3FC087; --bad:#F26B59;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C131C; --surface:#151F2B; --surface-2:#1B2735; --ink:#EDF2F8; --muted:#96A4B4; --line:#283645;
+  --a:#FF7B58; --b:#55A6EA; --both:#AB8DEC; --on-fill:#0C131C;
+  --gold:#F0B73A; --gold-soft:#2C2712; --good:#3FC087; --bad:#F26B59;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:.005em}
+h2{font-size:1.7rem;font-weight:700}
+h3{font-size:1.25rem;font-weight:700}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:16px 48px;display:grid;gap:18px}
+.wrap>*,.hero>*,.twocol>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.card>h2{margin-bottom:4px}
+.sub{color:var(--muted);font-size:.95rem}
+
+/* top bar */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.wordmark{font-family:var(--display);font-weight:800;font-size:1.35rem;letter-spacing:.01em;white-space:nowrap}
+.wordmark em{font-style:normal;color:var(--a)}
+.topbar .bar{flex:1;min-width:0;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.topbar .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--b),var(--both),var(--a));border-radius:99px;transition:width .5s ease}
+.topbar .tally{font-family:var(--display);font-weight:700;font-size:1.05rem;white-space:nowrap}
+.topbar .tally span{color:var(--muted);font-weight:600}
+@media (max-width:430px){.topbar .tally span{display:none}.wordmark{font-size:1.2rem}}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1fr;gap:18px;padding:18px}
+@media (min-width:640px){.hero{grid-template-columns:1.1fr 1fr;align-items:center}}
+.mtn{position:relative}
+.mtn svg{display:block;width:100%;height:auto;max-width:100%}
+.mc{fill:var(--line);transition:fill .25s}
+.mc.own-A{fill:var(--a)}.mc.own-B{fill:var(--b)}.mc.own-both{fill:var(--both)}
+.mc.covered{fill:var(--gold)}
+.mc.missed{fill:var(--surface);stroke:var(--bad);stroke-width:.14}
+.mc.milestone{stroke:var(--gold);stroke-width:.16;stroke-dasharray:.25 .14}
+.mc.today{stroke:var(--ink);stroke-width:.2;stroke-dasharray:none}
+@media (prefers-reduced-motion:no-preference){.mc.today{animation:pulse 1.8s ease-in-out infinite}}
+@keyframes pulse{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
+.flag-pole{stroke:var(--ink);stroke-width:.12}
+.flag{fill:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.82rem;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:50%;background:var(--line);display:inline-block}
+.legend .lA{background:var(--a)}.legend .lB{background:var(--b)}.legend .lboth{background:var(--both)}.legend .lgold{background:var(--gold)}
+.legend .lmiss{background:var(--surface);border:1.5px solid var(--bad)}
+.legend .ltoday{background:var(--surface);border:2px solid var(--ink)}
+.figures .big{font-family:var(--display);font-weight:800;font-size:clamp(3.2rem,12vw,4.6rem);line-height:.95;letter-spacing:-.01em}
+.figures .of{color:var(--muted);font-size:1rem;margin-top:6px}
+.figures .of b{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.stat{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.stat .k{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat .v{font-family:var(--display);font-weight:700;font-size:1.5rem;line-height:1.1;margin-top:2px}
+.stat .v.good{color:var(--good)}.stat .v.bad{color:var(--bad)}
+.stat .d{font-size:.8rem;color:var(--muted)}
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.split div{border-top:3px solid var(--line);padding-top:6px;min-width:0}
+.split .sA{border-color:var(--a)}.split .sB{border-color:var(--b)}.split .sboth{border-color:var(--both)}
+.split .n{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.split .v{font-family:var(--display);font-weight:700;font-size:1.25rem}
+.names-nudge{margin-top:8px;font-size:.85rem}
+.names-nudge button{background:none;border:0;padding:0;color:var(--b);text-decoration:underline;font-weight:600}
+
+/* today card */
+.today .head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;justify-content:space-between}
+.today .daytag{font-family:var(--display);font-weight:800;font-size:1.6rem}
+.today .daytag small{font-size:1rem;font-weight:600;color:var(--muted);margin-left:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:3px 10px;font-size:.82rem;font-weight:600;background:var(--surface-2);border:1px solid var(--line)}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--muted)}
+.chip.oA i{background:var(--a)}.chip.oB i{background:var(--b)}.chip.oboth i{background:var(--both)}
+.chip.t-payday{border-color:var(--ink)}.chip.t-camp,.chip.t-summit{background:var(--gold-soft);border-color:var(--gold)}
+.today .amt{font-family:var(--display);font-weight:800;font-size:clamp(3rem,14vw,4.2rem);line-height:1;margin-top:10px}
+.today .blurb{color:var(--muted);max-width:52ch;margin-top:6px}
+.btn{border:0;border-radius:10px;padding:12px 18px;font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.02em;background:var(--ink);color:var(--bg);transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.done{background:var(--good);color:var(--on-fill)}
+.btn.ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line);font-size:1rem;padding:8px 12px}
+.btn.danger{background:var(--bad);color:var(--on-fill);font-size:1rem;padding:8px 12px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.today .act{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.today .act .note{font-size:.85rem;color:var(--muted)}
+.week{margin-top:16px}
+.week .eyebrow{margin-bottom:6px}
+
+/* day tiles */
+.grid7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.dow{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-align:center;color:var(--muted);padding-bottom:2px}
+.tile{position:relative;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;background:var(--surface);min-height:52px;padding:4px 4px 3px 6px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;line-height:1.1;min-width:0}
+.tile .tn{font-size:.66rem;color:var(--muted);font-weight:600}
+.tile .ta{font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.01em}
+.tile .tk{position:absolute;right:4px;top:3px;font-size:.7rem;font-weight:700;opacity:0}
+.tile.own-A{border-left-color:var(--a)}.tile.own-B{border-left-color:var(--b)}.tile.own-both{border-left-color:var(--both)}
+.tile.t-payday .ta{font-size:1.12rem}
+.tile.t-camp,.tile.t-summit{background:var(--gold-soft)}
+.tile.saved{color:var(--on-fill);border-color:transparent}
+.tile.saved .tn{color:var(--on-fill);opacity:.8}
+.tile.saved .tk{opacity:1}
+.tile.saved.own-A{background:var(--a)}.tile.saved.own-B{background:var(--b)}.tile.saved.own-both{background:var(--both)}
+.tile.covered:not(.saved){background:var(--gold-soft);border-color:var(--gold);border-left-color:var(--gold)}
+.tile.covered:not(.saved) .tk{opacity:1;color:var(--gold)}
+.tile.missed:not(.saved){border-style:dashed;border-left-style:solid}
+.tile.missed:not(.saved) .ta{color:var(--bad)}
+.tile.today{box-shadow:0 0 0 2px var(--ink)}
+.tile.pad{visibility:hidden}
+.tile.ro{cursor:default}
+
+/* altimeter */
+.alti{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:0;position:relative}
+.alti li{display:grid;grid-template-columns:22px 1fr auto;gap:12px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line)}
+.alti li:last-child{border-bottom:0}
+.alti .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);margin-top:4px;position:relative}
+.alti li.hit .dot{background:var(--gold);border-color:var(--gold)}
+.alti li.hit .dot::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:7px;border:solid var(--on-fill);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.alti li.next .dot{border-color:var(--ink);border-style:dashed}
+.alti .nm{font-family:var(--display);font-weight:700;font-size:1.1rem}
+.alti .nm small{font-weight:600;color:var(--muted);font-size:.85rem;margin-left:6px}
+.alti .tr{font-size:.86rem;color:var(--muted);max-width:48ch}
+.alti .ft{font-family:var(--display);font-weight:700;font-size:1.1rem;text-align:right}
+.alti .ft small{display:block;font-family:var(--body);font-weight:500;font-size:.75rem;color:var(--muted)}
+.alti li.hit .nm{color:var(--gold)}
+.alti li.summit .nm{font-size:1.25rem}
+
+/* levels */
+.levels{display:grid;gap:10px}
+.levels>h2{margin-bottom:-2px}
+details.level{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+details.level>summary{list-style:none;cursor:pointer;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+details.level>summary::-webkit-details-marker{display:none}
+.lv-t{font-family:var(--display);font-weight:700;font-size:1.2rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.lv-t .lvn{color:var(--muted);font-weight:600;font-size:.95rem}
+.lv-r{font-size:.82rem;color:var(--muted)}
+.lv-s{text-align:right;font-family:var(--display);font-weight:700;font-size:1.1rem;white-space:nowrap}
+.lv-s small{display:block;font-family:var(--body);font-weight:500;font-size:.75rem;color:var(--muted)}
+.lv-bar{grid-column:1/-1;height:5px;background:var(--line);border-radius:99px;overflow:hidden}
+.lv-bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .4s}
+details.level.now>summary .lv-t::before{content:"NOW";font-size:.65rem;letter-spacing:.1em;background:var(--ink);color:var(--bg);padding:2px 6px;border-radius:4px;align-self:center}
+details.level.done>summary .lv-bar i{background:var(--gold)}
+.lv-body{padding:4px 12px 14px}
+
+/* boosts */
+.blist{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.blist li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;background:var(--gold-soft);border-radius:8px;padding:8px 10px}
+.blist .bn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.blist .bn small{color:var(--muted);margin-left:6px}
+.blist .ba{font-family:var(--display);font-weight:700;font-size:1.1rem}
+.blist .bx{background:none;border:0;color:var(--muted);font-size:1.1rem;padding:0 4px;line-height:1}
+.blist .empty{background:none;color:var(--muted);font-size:.9rem;padding:4px 0}
+.bform{display:grid;grid-template-columns:120px 1fr auto;gap:8px;margin-top:12px}
+@media (max-width:480px){.bform{grid-template-columns:1fr 1fr}.bform button{grid-column:1/-1}}
+input[type=number],input[type=text],input[type=date]{font:inherit;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+label.f{display:grid;gap:4px;font-size:.82rem;font-weight:600;color:var(--muted)}
+
+/* how it works */
+.rhythm{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.rhythm li{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.rhythm .d{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.04em}
+.rhythm .w{font-size:.9rem}.rhythm .w b{font-weight:600}
+.rhythm .w small{display:block;color:var(--muted)}
+.rhythm .m{font-family:var(--display);font-weight:700;font-size:1.15rem;white-space:nowrap}
+.tablewrap{overflow-x:auto;margin-top:12px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right}
+td.nm{font-family:var(--display);font-weight:700;font-size:1rem}
+tr.now td{background:var(--surface-2)}
+tfoot td{font-weight:700;border-bottom:0}
+.twocol{display:grid;gap:16px;margin-top:14px}
+@media (min-width:600px){.twocol{grid-template-columns:1fr 1fr}}
+.prose p+p{margin-top:8px}
+.prose{max-width:62ch}
+
+/* guide */
+.notes{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:12px;counter-reset:n}
+.notes li{display:grid;grid-template-columns:34px 1fr;gap:10px}
+.notes li::before{counter-increment:n;content:counter(n,decimal-leading-zero);font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--a);line-height:1.2}
+.notes b{font-weight:700}
+.notes p{color:var(--muted);font-size:.95rem;max-width:58ch}
+.notes p strong{color:var(--ink);font-weight:600}
+
+/* settings */
+.sform{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.sform .full{grid-column:1/-1}
+.sact{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.sact .msg{font-size:.85rem;color:var(--muted)}
+.banner{border-radius:10px;padding:10px 12px;font-size:.9rem;background:var(--gold-soft);border:1px solid var(--gold)}
+.banner[hidden]{display:none}
+footer{color:var(--muted);font-size:.82rem;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="in">
+    <div class="wordmark" id="wordmark">The <em>$25K</em> Climb</div>
+    <div class="bar" aria-hidden="true"><i id="topbar-fill"></i></div>
+    <div class="tally num" id="topbar-tally">$0 <span>/ $25,000</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="card" id="gate" hidden>
+    <h2>Join the climb</h2>
+    <p class="sub">Enter the passcode from your Apps Script project. You do this once per phone; after that the mountain stays in sync between you.</p>
+    <form class="bform" id="gate-form">
+      <label class="f">Passcode<input type="password" id="gate-key" autocomplete="current-password" required></label>
+      <button class="btn ghost" type="submit">Unlock</button>
+    </form>
+    <p class="sub" id="gate-msg"></p>
+  </section>
+
+  <section class="card" id="install" hidden>
+    <h2>Put it on your phone</h2>
+    <div class="install-row">
+      <p class="sub" id="install-text"></p>
+      <button class="btn ghost" type="button" id="install-btn" hidden>Install app</button>
+    </div>
+  </section>
+
+  <section class="card hero" aria-label="Progress">
+    <div class="mtn">
+      <svg id="mountain" viewBox="-0.5 -2.2 31 23.9" role="img" aria-label="365 dots arranged as a mountain, one per day of the challenge"></svg>
+      <div class="legend">
+        <span><i class="lA"></i><span id="lg-a">Partner A</span></span>
+        <span><i class="lB"></i><span id="lg-b">Partner B</span></span>
+        <span><i class="lboth"></i>Together</span>
+        <span><i class="lgold"></i>Boost</span>
+        <span><i class="lmiss"></i>Missed</span>
+        <span><i class="ltoday"></i>Today</span>
+      </div>
+    </div>
+    <div class="figures">
+      <div class="eyebrow">365-day savings challenge · two climbers · one summit</div>
+      <div class="big num" id="big-saved">$0</div>
+      <p class="of">saved of <b id="goal-txt" class="num">$25,000</b> · every dollar is a foot of elevation</p>
+      <div class="stats">
+        <div class="stat"><div class="k">Elevation</div><div class="v num" id="st-pct">0%</div><div class="d num" id="st-ft">0 ft of 25,000</div></div>
+        <div class="stat"><div class="k">Days saved</div><div class="v num" id="st-days">0 / 365</div><div class="d" id="st-togo">365 to go</div></div>
+        <div class="stat"><div class="k">Streak</div><div class="v num" id="st-streak">0</div><div class="d" id="st-streak-d">days in a row</div></div>
+        <div class="stat"><div class="k">Pace</div><div class="v num" id="st-pace">—</div><div class="d" id="st-pace-d">vs. plan to date</div></div>
+      </div>
+      <div class="split">
+        <div class="sA"><div class="n" id="sp-a-n">Partner A</div><div class="v num" id="sp-a">$0</div></div>
+        <div class="sB"><div class="n" id="sp-b-n">Partner B</div><div class="v num" id="sp-b">$0</div></div>
+        <div class="sboth"><div class="n">Together + boosts</div><div class="v num" id="sp-both">$0</div></div>
+      </div>
+      <div class="names-nudge" id="names-nudge" hidden>Climbing as "Partner A" and "Partner B"? <button type="button" id="nudge-btn">Add your names</button></div>
+    </div>
+  </section>
+
+  <section class="card today" id="today" aria-label="Today">
+    <div class="head">
+      <div class="daytag" id="td-tag">Day 1 <small>Mon, Oct 12</small></div>
+      <div class="sub" id="td-level">Level 1 · Trailhead</div>
+    </div>
+    <div class="chips" id="td-chips"></div>
+    <div class="amt num" id="td-amt">$150</div>
+    <p class="blurb" id="td-blurb"></p>
+    <div class="act">
+      <button class="btn" type="button" id="td-btn">Mark Day 1 saved</button>
+      <span class="note" id="td-note"></span>
+    </div>
+    <div class="week">
+      <div class="eyebrow" id="wk-title">This week · $472</div>
+      <div class="grid7" id="wk-grid"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Altimeter">
+    <h2>Altimeter</h2>
+    <p class="sub">$1 = 1 foot. You pass real summits on the way up, and each one comes with a cheap celebration. Spend time, not the fund.</p>
+    <ul class="alti" id="alti"></ul>
+  </section>
+
+  <section class="levels" aria-label="The climb, level by level">
+    <h2>The climb, level by level</h2>
+    <p class="sub">Tap a day when the money has moved. The base rate rises a little each level; the first day of every level is a Base Camp deposit.</p>
+    <div id="levels"></div>
+  </section>
+
+  <section class="card" aria-label="Boosts">
+    <h2>Boosts</h2>
+    <p class="sub">Windfalls go on the mountain: tax refund, bonus, side income, the thing you finally sold. A boost never cancels a day. It fills missed days first, then pulls the summit closer.</p>
+    <ul class="blist" id="blist"></ul>
+    <form class="bform" id="bform">
+      <label class="f">Amount<input type="number" id="b-amount" min="1" step="1" inputmode="numeric" placeholder="250" required></label>
+      <label class="f">What it was<input type="text" id="b-note" maxlength="60" placeholder="Tax refund" required></label>
+      <button class="btn ghost" type="submit" id="b-btn">Add boost</button>
+    </form>
+  </section>
+
+  <section class="card" aria-label="How the climb works">
+    <h2>How the climb works</h2>
+    <p class="sub">Every week has the same shape. Only the base rate changes, once per level, so the first months feel easy and the habit carries the harder ones.</p>
+    <ul class="rhythm" id="rhythm"></ul>
+    <div class="twocol">
+      <div class="prose">
+        <h3>Two climbers, one rope</h3>
+        <p>Mon–Sat days alternate between you, and the order flips each week so Payday Fridays land evenly. Sundays and Base Camps are shared. Over the year the plan splits almost exactly 50/50, with about a fifth of the total saved together.</p>
+        <p>Swap days whenever life needs it. The mountain only counts dollars.</p>
+      </div>
+      <div class="prose">
+        <h3>Why it escalates</h3>
+        <p>The base rate climbs <span id="esc-txt">$46 → $68 a day</span>. Starting light builds the streak while the account is new; by the time the numbers grow, the transfer is a reflex and the balance is motivating on its own.</p>
+        <p id="interest-txt">In a high-yield account at 4.0% APY the growing balance also earns about $470 by Summit Day.</p>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table id="ladder">
+        <thead><tr><th>Level</th><th>Dates</th><th class="r">Base / day</th><th class="r">Payday Fri</th><th class="r">Per week</th><th class="r">Level total</th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Guide notes">
+    <h2>Guide notes</h2>
+    <p class="sub">Seven rules from the people who make it to the top.</p>
+    <ol class="notes" id="notes">
+      <li><div><b>Automate the floor.</b><p>Open a separate high-yield savings account, name it after the goal, and set one recurring transfer every Friday for the week's total (<strong id="n-week">$368 this week</strong>). The taps are the ritual. The transfer is the engine.</p></div></li>
+      <li><div><b>Pay the mountain first.</b><p>Move the money the day pay lands, before anything else gets spent. If the week's number isn't there, the budget is the thing to fix, not the challenge.</p></div></li>
+      <li><div><b>Let interest climb with you.</b><p id="n-interest">At 4.0% APY the plan's balance earns about $470 by Summit Day, roughly a week of climbing you don't have to do.</p></div></li>
+      <li><div><b>Missed a day? Tap it late. Never double the next one.</b><p>Two rules keep the streak honest: never skip two in a row, and Sundays are for catching up.</p></div></li>
+      <li><div><b>Windfalls go on the mountain.</b><p>Refunds, bonuses, side income, sold stuff: log each one as a boost the day it arrives, before it finds another job.</p></div></li>
+      <li><div><b>Celebrate every camp, cheaply.</b><p>Each altimeter milestone has a ritual under $25. Hitting a milestone and then raiding the fund is how climbs end early.</p></div></li>
+      <li><div><b>Keep the summit in view.</b><p>Decide now where the $25,000 goes the week you reach it: brokerage, down payment, index fund. Money with a destination is much harder to spend.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="card" aria-label="Settings" id="settings">
+    <h2>Set up the climb</h2>
+    <p class="sub">Change the start date before Day 1 if you can. Names and APY can change any time.</p>
+    <form class="sform" id="sform">
+      <label class="f">Day 1<input type="date" id="s-start" required></label>
+      <label class="f">Goal ($)<input type="number" id="s-goal" min="1000" step="500" inputmode="numeric" required></label>
+      <label class="f">Climber A<input type="text" id="s-nameA" maxlength="24" placeholder="Partner A"></label>
+      <label class="f">Climber B<input type="text" id="s-nameB" maxlength="24" placeholder="Partner B"></label>
+      <label class="f full">Savings account APY (%)<input type="number" id="s-apy" min="0" max="20" step="0.1" inputmode="decimal"></label>
+    </form>
+    <div class="sact">
+      <button class="btn ghost" type="submit" form="sform" id="s-save">Save settings</button>
+      <button class="btn danger" type="button" id="s-reset">Reset progress</button>
+      <span class="msg" id="s-msg"></span>
+    </div>
+  </section>
+
+  <footer id="storage-note">Loading your climb…</footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+const DEFAULTS = { start:'2026-10-12', goal:25000, nameA:'Partner A', nameB:'Partner B', apy:4.0 };
+const LEVEL_NAMES = ['Trailhead','Foothills','Treeline','Switchbacks','Alpine Meadow','Base Camp','Glacier','Icefall','High Camp','The Ridge','Thin Air','Summit Push'];
+const TYPES = {
+  climb:  { label:'Climb day',          blurb:'One steady step. Move it before the day gets busy.' },
+  payday: { label:'Payday Friday',      blurb:'Double step. Move the week’s big chunk the moment pay lands.' },
+  nospend:{ label:'No-Spend Saturday',  blurb:'Spend nothing today. Bank what you would have.' },
+  sunday: { label:'Summit Sunday',      blurb:'Ten-minute money date: split today’s amount, tap the week closed, pick who’s up tomorrow.' },
+  camp:   { label:'Base Camp',          blurb:'New level, new base rate. Plant the flag together with the level-up deposit.' },
+  summit: { label:'Summit Day',         blurb:'The last push covers whatever is left to the goal. Then the summit dinner.' }
+};
+const MILESTONES = [
+  { ft:2722,  name:'Burj Khalifa', tag:'tallest building on Earth', treat:'Watch a sunset from the highest spot you can reach on foot.' },
+  { ft:4413,  name:'Ben Nevis', tag:'highest in the British Isles', treat:'Pub night at home: one good drink each, toast the first mile.' },
+  { ft:7972,  name:'Machu Picchu', tag:'the citadel', treat:'Cook a dinner from a country you want to visit.' },
+  { ft:10023, name:'Haleakalā', tag:'five figures', treat:'Sunrise walk together, phones off.' },
+  { ft:12389, name:'Mount Fuji', tag:'halfway is 12,500', treat:'Print the mountain and pin it to the fridge.' },
+  { ft:14411, name:'Mount Rainier', tag:'highest in the Cascades', treat:'Rewatch the first movie you saw together.' },
+  { ft:15774, name:'Mont Blanc', tag:'roof of the Alps', treat:'Picnic at the highest point you can drive to.' },
+  { ft:18510, name:'Mount Elbrus', tag:'highest in Europe', treat:'Write down what the money is for. Read it aloud to each other.' },
+  { ft:19341, name:'Kilimanjaro', tag:'highest in Africa', treat:'A day trip somewhere within an hour of home you have never been.' },
+  { ft:20310, name:'Denali', tag:'highest in North America', treat:'Spa night at home. The fund stays untouched.' },
+  { ft:22838, name:'Aconcagua', tag:'highest outside Asia', treat:'Plan the summit dinner. Book nothing yet.' }
+];
+const SUMMIT_TREAT = 'Summit dinner. Then open the investment account and move the money the same week.';
+
+const state = { settings: Object.assign({}, DEFAULTS), days:{}, boosts:{} };
+let plan = [], levels = [], startDate = null, mountainCells = [], tileEls = [], readOnly = false, storageMode = 'none', sformDirty = false;
+const $ = (s) => document.querySelector(s);
+const money = (n) => (n < 0 ? '-' : '') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const fmtNum = (n) => Math.round(n).toLocaleString('en-US');
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- dates ---------- */
+function parseISO(iso){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m) return parseISO(DEFAULTS.start); return new Date(+m[1], +m[2]-1, +m[3]); }
+function addDays(d, n){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate()+n); return x; }
+function addMonths(d, n){ const x = new Date(d.getFullYear(), d.getMonth()+n, 1); const last = new Date(x.getFullYear(), x.getMonth()+1, 0).getDate(); x.setDate(Math.min(d.getDate(), last)); return x; }
+function sameDay(a, b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function todayMid(){ const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+function dayIndexOf(date){ return Math.round((date - startDate) / 86400000) + 1; }
+const fmtShort = (d) => d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+const fmtMD = (d) => d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+const fmtMDY = (d) => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+function toISO(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
+/* ---------- the plan ---------- */
+function buildPlan(){
+  const s = state.settings;
+  startDate = parseISO(s.start);
+  const goal = Math.max(1000, Number(s.goal) || DEFAULTS.goal);
+  const k = goal / 25000;
+  plan = []; levels = [];
+  let L = 1, next = addMonths(startDate, 1), nonSun = 0;
+  for (let L2 = 1; L2 <= 12; L2++) {
+    const a = addMonths(startDate, L2-1);
+    const b = L2 < 12 ? addDays(addMonths(startDate, L2), -1) : addDays(startDate, 364);
+    levels.push({ n:L2, name:LEVEL_NAMES[L2-1], from:a, to:b, base:Math.round(k*(46 + 2*(L2-1))), days:[], total:0 });
+  }
+  for (let i = 0; i < 365; i++) {
+    const date = addDays(startDate, i);
+    while (L < 12 && date >= next) { L++; next = addMonths(startDate, L); }
+    const base = levels[L-1].base;
+    const dow = date.getDay(), week = Math.floor(i/7);
+    let type, amount, owner;
+    if (dow === 0) { type='sunday'; amount=base; owner='both'; }
+    else if (dow === 5) { type='payday'; amount=base*2; }
+    else if (dow === 6) { type='nospend'; amount=base; }
+    else { type='climb'; amount=base; }
+    if (dow !== 0) { owner = ((nonSun + week) % 2 === 0) ? 'A' : 'B'; nonSun++; }
+    if (i === 0 || sameDay(date, levels[L-1].from)) { type='camp'; amount=Math.round(150*k); owner='both'; }
+    const d = { n:i+1, date, dow, level:L, type, amount, owner, base, cum:0 };
+    plan.push(d); levels[L-1].days.push(d);
+  }
+  const sum364 = plan.slice(0,364).reduce((t,d)=>t+d.amount, 0);
+  const last = plan[364]; last.type='summit'; last.owner='both'; last.amount = Math.max(0, goal - sum364);
+  let cum = 0; plan.forEach(d => { cum += d.amount; d.cum = cum; });
+  levels.forEach(l => { l.total = l.days.reduce((t,d)=>t+d.amount, 0); });
+  state.goalEff = goal;
+}
+
+/* ---------- derived state ---------- */
+function derive(){
+  const goal = state.goalEff;
+  const tIdx = dayIndexOf(todayMid());
+  const saved = (n) => !!state.days['d'+n];
+  let savedDollars = 0, savedCount = 0, a = 0, b = 0, both = 0;
+  plan.forEach(d => { if (saved(d.n)) { savedDollars += d.amount; savedCount++; if (d.owner==='A') a += d.amount; else if (d.owner==='B') b += d.amount; else both += d.amount; } });
+  let boostDollars = 0; Object.keys(state.boosts).forEach(k => { const v = state.boosts[k]; if (v && v.amount) boostDollars += Number(v.amount) || 0; });
+  const total = savedDollars + boostDollars;
+  let plannedToDate = 0; if (tIdx >= 1) plannedToDate = plan[Math.min(tIdx,365)-1].cum;
+  const pace = total - plannedToDate;
+  let streak = 0; if (tIdx >= 1) { let e = Math.min(tIdx, 365); if (!saved(e)) e--; while (e >= 1 && saved(e)) { streak++; e--; } }
+  const covered = new Set(); let rem = boostDollars;
+  for (let n = 1; n < Math.min(tIdx, 366); n++) { const d = plan[n-1]; if (!saved(n) && rem >= d.amount) { covered.add(n); rem -= d.amount; } }
+  let topCovered = 0;
+  for (let n = 365; n >= Math.max(tIdx, 1); n--) { const d = plan[n-1]; if (saved(n) || covered.has(n)) continue; if (rem >= d.amount) { covered.add(n); rem -= d.amount; } else break; }
+  for (let n = 365; n >= 1; n--) { if (covered.has(n) || saved(n)) { if (covered.has(n)) topCovered++; } else break; }
+  const milestoneDays = {}; MILESTONES.forEach(m => { const d = plan.find(x => x.cum >= m.ft); milestoneDays[m.ft] = d ? d.n : null; });
+  return { goal, tIdx, saved, savedDollars, savedCount, a, b, both, boostDollars, total, plannedToDate, pace, streak, covered, topCovered, milestoneDays };
+}
+
+/* ---------- static build (per plan) ---------- */
+const ROWS = [30,30,30,30,30,28,26,24,22,20,18,16,14,12,10,8,6,5,3,2,1]; // bottom to top, sums to 365
+function buildMountain(){
+  const svg = $('#mountain'); let out = ''; mountainCells = []; let n = 1;
+  const H = ROWS.length;
+  for (let r = 0; r < H; r++) { const w = ROWS[r], off = (30 - w) / 2; for (let j = 0; j < w; j++) { out += '<circle class="mc" data-n="'+n+'" cx="'+(off + j + 0.5)+'" cy="'+((H-1-r) + 0.5)+'" r="0.4"></circle>'; n++; } }
+  out += '<line class="flag-pole" x1="15" y1="0.1" x2="15" y2="-1.7"></line><polygon class="flag" points="15,-1.75 16.5,-1.25 15,-0.75"></polygon>';
+  svg.innerHTML = out;
+  mountainCells = Array.from(svg.querySelectorAll('.mc'));
+}
+function tileHTML(d, cls){
+  return '<button type="button" class="tile own-'+d.owner+' t-'+d.type+(cls||'')+'" data-n="'+d.n+'" aria-label="Day '+d.n+', '+fmtShort(d.date)+', '+money(d.amount)+'"><span class="tn num">'+d.n+'</span><span class="ta num">'+money(d.amount)+'</span><span class="tk">✓</span></button>';
+}
+function buildLevels(){
+  const host = $('#levels'); let out = '';
+  const dows = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  levels.forEach(l => {
+    out += '<details class="level" data-level="'+l.n+'"><summary>'
+      + '<div><div class="lv-t"><span class="lvn">Level '+l.n+'</span>'+l.name+'</div><div class="lv-r">'+fmtMD(l.from)+' – '+fmtMDY(l.to)+' · base '+money(l.base)+'/day</div></div>'
+      + '<div class="lv-s num"><span class="lv-saved">$0</span><small class="lv-cnt">0 of '+l.days.length+' days · '+money(l.total)+' planned</small></div>'
+      + '<div class="lv-bar"><i></i></div></summary><div class="lv-body"><div class="grid7">';
+    dows.forEach(w => { out += '<div class="dow">'+w[0]+'</div>'; });
+    const pad = (l.days[0].dow + 6) % 7;
+    for (let p = 0; p < pad; p++) out += '<div class="tile pad" aria-hidden="true"></div>';
+    l.days.forEach(d => { out += tileHTML(d); });
+    out += '</div></div></details>';
+  });
+  host.innerHTML = out;
+  tileEls = []; host.querySelectorAll('.tile[data-n]').forEach(t => { tileEls[+t.dataset.n] = t; });
+}
+function buildLadder(){
+  const tb = $('#ladder tbody'); let out = '';
+  levels.forEach(l => { out += '<tr data-level="'+l.n+'"><td class="nm">'+l.n+' · '+l.name+'</td><td>'+fmtMD(l.from)+' – '+fmtMD(l.to)+'</td><td class="r num">'+money(l.base)+'</td><td class="r num">'+money(l.base*2)+'</td><td class="r num">'+money(l.base*8)+'</td><td class="r num">'+money(l.total)+'</td></tr>'; });
+  tb.innerHTML = out;
+  $('#ladder tfoot').innerHTML = '<tr><td colspan="5">365 days</td><td class="r num">'+money(state.goalEff)+'</td></tr>';
+  $('#esc-txt').textContent = money(levels[0].base) + ' → ' + money(levels[11].base) + ' a day';
+}
+function buildAltimeter(){
+  const ul = $('#alti'); let out = '';
+  const list = MILESTONES.filter(m => m.ft < state.goalEff).map(m => Object.assign({}, m));
+  list.push({ ft: state.goalEff, name:'Summit', tag: state.goalEff >= 22838 ? 'higher than any peak outside Asia' : 'the goal', treat: SUMMIT_TREAT, summit:true });
+  list.forEach(m => {
+    out += '<li data-ft="'+m.ft+'" class="'+(m.summit?'summit':'')+'"><div class="dot"></div><div><div class="nm">'+esc(m.name)+'<small>'+esc(m.tag)+'</small></div><div class="tr">'+esc(m.treat)+'</div></div><div class="ft num">'+fmtNum(m.ft)+' ft<small class="when"></small></div></li>';
+  });
+  ul.innerHTML = out;
+}
+function buildRhythm(){
+  const ul = $('#rhythm');
+  const rows = [
+    ['MON–THU','Climb day','one of you · base rate','base'],
+    ['FRI','Payday Friday','one of you · double, moved the day pay lands','x2'],
+    ['SAT','No-Spend Saturday','one of you · spend nothing, bank the base','base'],
+    ['SUN','Summit Sunday','together · ten-minute money date, split it','base'],
+    ['CAMP','Base Camp','together · first day of each level','camp'],
+    ['DAY 365','Summit Day','together · whatever is left to the goal','summit']
+  ];
+  ul.innerHTML = rows.map(r => '<li><span class="d">'+r[0]+'</span><span class="w"><b>'+r[1]+'</b><small>'+r[2]+'</small></span><span class="m num" data-amt="'+r[3]+'"></span></li>').join('');
+}
+function buildAll(){
+  buildPlan(); buildMountain(); buildLevels(); buildLadder(); buildAltimeter(); buildRhythm();
+  const g = state.goalEff; const gk = g % 1000 === 0 ? (g/1000)+'K' : (g/1000).toFixed(1)+'K';
+  $('#wordmark').innerHTML = 'The <em>$'+gk+'</em> Climb';
+  $('#goal-txt').textContent = money(g);
+  const t = dayIndexOf(todayMid()); const cur = t < 1 ? 1 : t > 365 ? 12 : plan[t-1].level;
+  document.querySelectorAll('details.level').forEach(el => { el.open = (+el.dataset.level === cur); });
+  refresh();
+}
+
+/* ---------- refresh (per state change) ---------- */
+function refresh(){
+  const D = derive(); const s = state.settings;
+  const nameA = s.nameA || 'Partner A', nameB = s.nameB || 'Partner B';
+  const ownerName = (o) => o === 'A' ? nameA : o === 'B' ? nameB : 'Together';
+  const pct = Math.min(100, D.total / D.goal * 100);
+
+  // top bar + hero numbers
+  $('#topbar-fill').style.width = pct.toFixed(2) + '%';
+  $('#topbar-tally').innerHTML = money(D.total) + ' <span>/ ' + money(D.goal) + '</span>';
+  $('#big-saved').textContent = money(D.total);
+  $('#st-pct').textContent = (pct >= 10 || pct === 0 ? Math.floor(pct) : pct.toFixed(1)) + '%';
+  $('#st-ft').textContent = fmtNum(D.total) + ' ft of ' + fmtNum(D.goal);
+  $('#st-days').textContent = D.savedCount + ' / 365';
+  const togo = D.tIdx < 1 ? 'starts in ' + (1 - D.tIdx) + ' day' + (1 - D.tIdx === 1 ? '' : 's') : D.tIdx > 365 ? 'the year is done' : (365 - D.tIdx + 1) + ' day' + (365 - D.tIdx + 1 === 1 ? '' : 's') + ' left';
+  $('#st-togo').textContent = togo;
+  $('#st-streak').textContent = D.streak;
+  $('#st-streak-d').textContent = D.streak === 1 ? 'day in a row' : 'days in a row';
+  const paceEl = $('#st-pace'); paceEl.classList.remove('good','bad');
+  if (D.tIdx < 1) { paceEl.textContent = '—'; $('#st-pace-d').textContent = 'the climb hasn’t started'; }
+  else if (Math.abs(D.pace) < 1) { paceEl.textContent = 'On pace'; $('#st-pace-d').textContent = 'exactly on plan'; }
+  else if (D.pace > 0) { paceEl.textContent = '+' + money(D.pace); paceEl.classList.add('good'); $('#st-pace-d').textContent = 'ahead of plan to date'; }
+  else { paceEl.textContent = money(D.pace); paceEl.classList.add('bad'); $('#st-pace-d').textContent = 'behind plan to date'; }
+  $('#sp-a-n').textContent = nameA; $('#sp-b-n').textContent = nameB; $('#lg-a').textContent = nameA; $('#lg-b').textContent = nameB;
+  $('#sp-a').textContent = money(D.a); $('#sp-b').textContent = money(D.b); $('#sp-both').textContent = money(D.both + D.boostDollars);
+  $('#names-nudge').hidden = !(nameA === 'Partner A' && nameB === 'Partner B') || readOnly;
+
+  // mountain
+  const msDays = new Set(Object.values(D.milestoneDays).filter(Boolean));
+  for (let n = 1; n <= 365; n++) {
+    const c = mountainCells[n-1]; if (!c) continue; const d = plan[n-1];
+    let cls = 'mc';
+    if (D.saved(n)) cls += ' own-' + d.owner;
+    else if (D.covered.has(n)) cls += ' covered';
+    else if (n < D.tIdx) cls += ' missed';
+    if (msDays.has(n)) cls += ' milestone';
+    if (n === D.tIdx) cls += ' today';
+    c.setAttribute('class', cls);
+  }
+
+  // today card
+  const idx = D.tIdx, inRange = idx >= 1 && idx <= 365;
+  const td = inRange ? plan[idx-1] : (idx < 1 ? plan[0] : plan[364]);
+  const chips = (d) => '<span class="chip t-'+d.type+'">'+TYPES[d.type].label+'</span><span class="chip o'+d.owner+'"><i></i>'+esc(ownerName(d.owner))+(d.owner==='both' ? '' : '’s day')+'</span>';
+  $('#td-chips').innerHTML = chips(td);
+  $('#td-amt').textContent = money(td.amount);
+  $('#td-level').textContent = 'Level ' + td.level + ' · ' + LEVEL_NAMES[td.level-1];
+  const btn = $('#td-btn'); btn.disabled = false; btn.classList.remove('done');
+  if (idx < 1) {
+    $('#td-tag').innerHTML = 'Day 1 <small>' + fmtShort(td.date) + '</small>';
+    $('#td-blurb').textContent = 'The climb starts in ' + (1 - idx) + ' day' + (1 - idx === 1 ? '' : 's') + '. Day 1 is a Base Camp: open the account, name it, and plant the flag with the first deposit together.';
+    btn.textContent = 'Mark Day 1 saved early'; btn.dataset.n = 1;
+    $('#td-note').textContent = '';
+  } else if (idx > 365) {
+    $('#td-tag').innerHTML = 'Day 365 <small>' + fmtShort(td.date) + '</small>';
+    $('#td-blurb').textContent = D.total >= D.goal ? 'Summit reached. Move the money to its destination this week.' : 'The year is over with ' + money(D.goal - D.total) + ' still to go. Tap the days you catch up on; the mountain is patient.';
+    btn.textContent = D.saved(365) ? 'Summit Day saved ✓' : 'Mark Summit Day saved'; btn.dataset.n = 365; if (D.saved(365)) btn.classList.add('done');
+    $('#td-note').textContent = '';
+  } else {
+    $('#td-tag').innerHTML = 'Day ' + idx + ' <small>' + fmtShort(td.date) + '</small>';
+    $('#td-blurb').textContent = TYPES[td.type].blurb;
+    btn.dataset.n = idx;
+    if (D.saved(idx)) { btn.textContent = 'Day ' + idx + ' saved ✓'; btn.classList.add('done'); $('#td-note').textContent = 'Tap again to undo.'; }
+    else { btn.textContent = 'Mark Day ' + idx + ' saved'; $('#td-note').textContent = D.covered.has(idx) ? 'A boost already covers today. Tap anyway to get further ahead.' : ''; }
+  }
+  if (readOnly) { btn.disabled = true; $('#td-note').textContent = 'View only on this account.'; }
+
+  // this week strip
+  const wkStart = inRange ? Math.floor((idx-1)/7)*7 + 1 : (idx < 1 ? 1 : 359);
+  const wkDays = plan.slice(wkStart-1, Math.min(wkStart+6, 365));
+  let wkTotal = wkDays.reduce((t,d)=>t+d.amount, 0);
+  $('#wk-title').textContent = (inRange ? 'This week' : idx < 1 ? 'Week 1' : 'Final week') + ' · ' + money(wkTotal) + ' planned';
+  const pad = (wkDays[0].dow + 6) % 7; let wk = '';
+  for (let p = 0; p < pad; p++) wk += '<div class="tile pad" aria-hidden="true"></div>';
+  wkDays.forEach(d => { wk += tileHTML(d, ' wk'); });
+  $('#wk-grid').innerHTML = wk;
+  $('#n-week').textContent = money(wkTotal) + (inRange ? ' this week' : ' in week 1');
+
+  // tiles (levels + week strip)
+  const paint = (t) => { const n = +t.dataset.n, d = plan[n-1]; t.classList.toggle('saved', D.saved(n)); t.classList.toggle('covered', D.covered.has(n)); t.classList.toggle('missed', !D.saved(n) && n < D.tIdx); t.classList.toggle('today', n === D.tIdx); t.classList.toggle('ro', readOnly); t.setAttribute('aria-pressed', D.saved(n) ? 'true' : 'false'); if (d) { t.querySelector('.tk').textContent = D.saved(n) ? '✓' : (D.covered.has(n) ? '⚡' : ''); } };
+  for (let n = 1; n <= 365; n++) if (tileEls[n]) paint(tileEls[n]);
+  document.querySelectorAll('#wk-grid .tile[data-n]').forEach(paint);
+
+  // level headers
+  levels.forEach(l => {
+    const el = document.querySelector('details.level[data-level="'+l.n+'"]'); if (!el) return;
+    let sv = 0, sc = 0; l.days.forEach(d => { if (D.saved(d.n)) { sv += d.amount; sc++; } });
+    el.querySelector('.lv-saved').textContent = money(sv);
+    el.querySelector('.lv-cnt').textContent = sc + ' of ' + l.days.length + ' days · ' + money(l.total) + ' planned';
+    el.querySelector('.lv-bar i').style.width = (l.total ? Math.min(100, sv / l.total * 100) : 0).toFixed(1) + '%';
+    const isNow = inRange && plan[idx-1].level === l.n;
+    el.classList.toggle('now', isNow); el.classList.toggle('done', sc === l.days.length);
+    const tr = document.querySelector('#ladder tr[data-level="'+l.n+'"]'); if (tr) tr.classList.toggle('now', isNow);
+  });
+
+  // altimeter
+  let nextMarked = false;
+  document.querySelectorAll('#alti li').forEach(li => {
+    const ft = +li.dataset.ft; const hit = D.total >= ft; li.classList.toggle('hit', hit);
+    const when = li.querySelector('.when');
+    if (hit) when.textContent = 'reached';
+    else { const dn = ft >= D.goal ? 365 : D.milestoneDays[ft]; when.textContent = dn ? 'planned day ' + dn + ' · ' + fmtMD(plan[dn-1].date) : ''; }
+    li.classList.toggle('next', !hit && !nextMarked); if (!hit) nextMarked = true;
+  });
+
+  // boosts
+  const keys = Object.keys(state.boosts).filter(k => state.boosts[k] && state.boosts[k].amount).sort((x,y) => String(state.boosts[x].at).localeCompare(String(state.boosts[y].at)));
+  const bl = $('#blist');
+  if (!keys.length) bl.innerHTML = '<li class="empty">No boosts yet. The first one usually shows up within a month once you start looking for it.</li>';
+  else bl.innerHTML = keys.map(k => { const b = state.boosts[k]; const dt = b.at ? fmtMD(new Date(b.at)) : ''; return '<li data-k="'+esc(k)+'"><span class="bn">'+esc(b.note || 'Boost')+'<small>'+dt+'</small></span><span class="ba num">+'+money(b.amount)+'</span>'+(readOnly ? '' : '<button type="button" class="bx" aria-label="Remove boost">×</button>')+'</li>'; }).join('')
+    + (D.topCovered > 0 ? '<li class="empty">Boosts have paid for the last ' + D.topCovered + ' day' + (D.topCovered===1?'':'s') + ' of the climb. Your summit is now Day ' + (365 - D.topCovered) + ' (' + fmtMDY(plan[364 - D.topCovered].date) + ').</li>' : '');
+  $('#b-btn').disabled = readOnly; $('#b-amount').disabled = readOnly; $('#b-note').disabled = readOnly;
+
+  // rhythm amounts for the current level
+  const curL = inRange ? plan[idx-1].level : (idx < 1 ? 1 : 12); const base = levels[curL-1].base;
+  document.querySelectorAll('#rhythm .m').forEach(m => { const t = m.dataset.amt; m.textContent = t === 'base' ? money(base) : t === 'x2' ? money(base*2) : t === 'camp' ? money(Math.round(150 * D.goal / 25000)) : money(plan[364].amount); });
+
+  // interest
+  const apy = Math.max(0, Number(s.apy) || 0); let interest = 0; plan.forEach(d => { interest += d.cum * apy / 100 / 365; });
+  const avgDay = D.goal / 365; const daysWorth = interest / avgDay;
+  const itxt = apy > 0 ? 'At ' + apy.toFixed(1) + '% APY the plan’s growing balance also earns about ' + money(Math.round(interest / 10) * 10) + ' by Summit Day, roughly ' + Math.round(daysWorth) + ' days of climbing you don’t have to do.' : 'Set your savings account’s APY in the settings to see what interest adds by Summit Day.';
+  $('#n-interest').textContent = itxt;
+  $('#interest-txt').textContent = apy > 0 ? 'In a high-yield account at ' + apy.toFixed(1) + '% APY the growing balance also earns about ' + money(Math.round(interest / 10) * 10) + ' by Summit Day.' : 'Park it in a high-yield savings account so the balance earns while it waits.';
+
+  // settings form (only when not focused)
+  if (!sformDirty && (!document.activeElement || !document.activeElement.closest || !document.activeElement.closest('#sform'))) {
+    $('#s-start').value = toISO(startDate); $('#s-goal').value = D.goal; $('#s-nameA').value = s.nameA === 'Partner A' ? '' : (s.nameA || ''); $('#s-nameB').value = s.nameB === 'Partner B' ? '' : (s.nameB || ''); $('#s-apy').value = apy;
+  }
+  $('#s-save').disabled = readOnly; $('#s-reset').disabled = readOnly;
+}
+
+/* ---------- storage (installable app + Apps Script JSON API) ---------- */
+const CONFIG = {
+  apiUrl: 'https://script.google.com/macros/s/AKfycbwTzj_AQwKr4iHIoce_2xVh0_yay8dgjb8C79xtI1yYUO8ku0iHKNfeyBG7TWHeOEa88Q/exec'   // <- paste your Apps Script web app URL here (it ends in /exec). Empty = this phone only.
+};
+const LS_KEY = 'climb25k.v1', KEY_KEY = 'climb25k.key', OUTBOX_KEY = 'climb25k.outbox';
+let storeReady = false, outbox = [], flushing = false, fetchFails = 0, gateOpen = false;
+const hasAPI = () => /^https:\/\/script\.google\.com\/macros\/s\/[^\s/]+\/exec$/.test((CONFIG.apiUrl || '').trim());
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
+function setStorageNote(msg){
+  const f = $('#storage-note');
+  if (msg) { f.textContent = msg; return; }
+  if (!hasAPI()) f.textContent = 'Progress is saved on this phone only. To share it, paste your Apps Script URL into CONFIG.apiUrl in index.html.';
+  else if (outbox.length) f.textContent = outbox.length + ' change' + (outbox.length === 1 ? '' : 's') + ' waiting to sync. They go up as soon as you are back online.';
+  else f.textContent = storeReady ? 'Shared climb: both phones see the same taps. Updates from the other phone arrive within a minute.' : 'Loading your climb\u2026';
+}
+function getKey(){ try { return localStorage.getItem(KEY_KEY) || ''; } catch (e) { return ''; } }
+function setKey(k){ try { localStorage.setItem(KEY_KEY, k); } catch (e) {} }
+function localSave(){ try { localStorage.setItem(LS_KEY, JSON.stringify({ settings: state.settings, days: state.days, boosts: state.boosts })); } catch (e) {} }
+function localLoad(){ try { const raw = localStorage.getItem(LS_KEY); if (!raw) return; const o = JSON.parse(raw); if (o && typeof o === 'object') { if (o.settings) state.settings = Object.assign({}, DEFAULTS, o.settings); state.days = o.days || {}; state.boosts = o.boosts || {}; } } catch (e) {} }
+function loadOutbox(){ try { outbox = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]'); if (!Array.isArray(outbox)) outbox = []; } catch (e) { outbox = []; } }
+function saveOutbox(){ try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(outbox)); } catch (e) {} }
+async function api(action, payload){
+  const body = Object.assign({ action, key: getKey() }, payload || {});
+  const res = await fetch(CONFIG.apiUrl.trim(), { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body), redirect:'follow' });
+  if (!res.ok) throw new Error('http ' + res.status);
+  const data = await res.json();
+  if (data && data.error) { const err = new Error(data.error); err.code = data.error; throw err; }
+  return data;
+}
+function showGate(msg){ gateOpen = true; $('#gate').hidden = false; $('#gate-msg').textContent = msg || ''; }
+function hideGate(){ gateOpen = false; $('#gate').hidden = true; }
+function applyServer(st){
+  if (!st || typeof st !== 'object') return;
+  const nextSettings = Object.assign({}, DEFAULTS, st.settings || {});
+  const changed = JSON.stringify(nextSettings) !== JSON.stringify(state.settings);
+  state.settings = nextSettings;
+  const days = {}; (st.savedDays || []).forEach(n => { days['d' + n] = { at: '' }; }); state.days = days;
+  const boosts = {}; (st.boosts || []).forEach(b => { if (b && b.id) boosts[b.id] = b; }); state.boosts = boosts;
+  const first = !storeReady; storeReady = true; localSave();
+  if (changed || first) buildAll(); else refresh();
+  setStorageNote();
+}
+function fetchState(){
+  if (!hasAPI() || gateOpen) return;
+  if (!getKey()) { showGate(''); return; }
+  api('state', {}).then(st => { fetchFails = 0; if (outbox.length === 0) applyServer(st); else flushOutbox(); })
+    .catch(e => {
+      if (e && e.code === 'bad_key') { showGate('That passcode didn\u2019t match. Check it in the Apps Script project and try again.'); return; }
+      fetchFails++; if (!storeReady) { storeReady = true; buildAll(); } setStorageNote('Offline or the server is unreachable. Showing the last known climb; taps are kept and synced later.');
+      if (fetchFails < 6) setTimeout(fetchState, Math.min(30000, 4000 * fetchFails));
+    });
+}
+async function flushOutbox(){
+  if (flushing || !outbox.length || !hasAPI() || gateOpen) return;
+  flushing = true; let last = null;
+  try {
+    while (outbox.length) { const w = outbox[0]; last = await api(w.action, w.payload); outbox.shift(); saveOutbox(); }
+    if (last) applyServer(last); else setStorageNote();
+  } catch (e) {
+    if (e && e.code === 'bad_key') showGate('That passcode didn\u2019t match.');
+    else setStorageNote();
+  } finally { flushing = false; }
+}
+function enqueueWrite(action, payload){ if (!hasAPI()) { localSave(); return; } outbox.push({ action, payload }); saveOutbox(); setStorageNote(); flushOutbox(); }
+function persistDays(patch){ const p = {}; Object.keys(patch).forEach(k => { p[k] = !!patch[k]; }); localSave(); enqueueWrite('patchDays', { patch: p }); }
+function persistBoosts(patch){ localSave(); enqueueWrite('patchBoosts', { patch }); }
+function persistSettings(){ localSave(); enqueueWrite('setSettings', { settings: state.settings }); }
+function resetAll(){ state.days = {}; state.boosts = {}; refresh(); localSave(); enqueueWrite('resetProgress', {}); }
+function initStore(){
+  localLoad(); loadOutbox(); buildAll();
+  if (hasAPI()) {
+    fetchState();
+    setInterval(fetchState, 45000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { flushOutbox(); fetchState(); } });
+    window.addEventListener('online', () => { flushOutbox(); fetchState(); });
+  } else { storeReady = true; }
+  setStorageNote();
+}
+function canWrite(){ if (!storeReady) { toast('Still loading the climb\u2026 one moment.'); return false; } return true; }
+$('#gate-form').addEventListener('submit', (e) => { e.preventDefault(); const k = $('#gate-key').value.trim(); if (!k) return; setKey(k); $('#gate-key').value = ''; hideGate(); storeReady = false; setStorageNote(); fetchState(); flushOutbox(); });
+
+/* ---------- install prompt + service worker ---------- */
+(function installUI(){
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const card = $('#install'), txt = $('#install-text'), btn = $('#install-btn');
+  if (standalone) return;
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  card.hidden = false;
+  txt.textContent = isIOS ? 'On iPhone: tap the Share button in Safari, then \u201cAdd to Home Screen\u201d. It opens full-screen with its own icon.' : 'On Android: tap \u201cInstall app\u201d below, or open the browser menu and choose \u201cAdd to Home screen\u201d.';
+  let deferred = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; btn.hidden = false; });
+  btn.addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); try { await deferred.userChoice; } catch (e) {} deferred = null; btn.hidden = true; });
+  window.addEventListener('appinstalled', () => { card.hidden = true; });
+  if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
+})();
+
+/* ---------- events ---------- */
+function toggleDay(n){
+  if (!canWrite()) return;
+  if (!(n >= 1 && n <= 365)) return;
+  const key = 'd' + n; const now = !state.days[key];
+  state.days[key] = now ? { at: new Date().toISOString() } : null;
+  refresh();
+  persistDays({ [key]: state.days[key] });
+  if (now) { const D = derive(); const m = MILESTONES.concat([{ft:D.goal, name:'the Summit'}]).find(m => D.total >= m.ft && D.total - plan[n-1].amount < m.ft); if (m) toast('You just passed ' + m.name + ' — ' + fmtNum(m.ft) + ' ft. Go celebrate.'); }
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('.tile[data-n]'); if (t) { toggleDay(+t.dataset.n); return; }
+  if (e.target.closest('#td-btn')) { toggleDay(+$('#td-btn').dataset.n); return; }
+  const bx = e.target.closest('.bx'); if (bx) { const k = bx.closest('li').dataset.k; if (!k || !canWrite()) return; state.boosts[k] = null; refresh(); persistBoosts({ [k]: null }); return; }
+  if (e.target.closest('#nudge-btn')) { $('#settings').scrollIntoView({ behavior:'smooth', block:'start' }); setTimeout(() => $('#s-nameA').focus(), 400); return; }
+});
+$('#bform').addEventListener('submit', (e) => {
+  e.preventDefault(); if (!canWrite()) return;
+  const amt = Math.round(Number($('#b-amount').value)); const note = $('#b-note').value.trim().slice(0,60);
+  if (!(amt > 0)) { toast('Enter an amount above $0.'); return; }
+  const k = 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  state.boosts[k] = { amount: amt, note: note || 'Boost', at: new Date().toISOString() };
+  $('#b-amount').value = ''; $('#b-note').value = '';
+  refresh(); persistBoosts({ [k]: state.boosts[k] }); toast('+' + money(amt) + ' on the mountain.');
+});
+$('#sform').addEventListener('input', () => { sformDirty = true; });
+$('#sform').addEventListener('submit', (e) => {
+  e.preventDefault(); if (!canWrite()) return;
+  const start = $('#s-start').value; const goal = Math.round(Number($('#s-goal').value)); const apy = Number($('#s-apy').value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(start)) { $('#s-msg').textContent = 'Pick a Day 1 date.'; return; }
+  if (!(goal >= 1000)) { $('#s-msg').textContent = 'The goal needs to be at least $1,000.'; return; }
+  state.settings = { start, goal, nameA: $('#s-nameA').value.trim() || 'Partner A', nameB: $('#s-nameB').value.trim() || 'Partner B', apy: isFinite(apy) && apy >= 0 ? Math.round(apy*10)/10 : 0 };
+  sformDirty = false; buildAll(); persistSettings(); $('#s-msg').textContent = 'Saved.'; setTimeout(() => { $('#s-msg').textContent = ''; }, 2500);
+  document.activeElement && document.activeElement.blur && document.activeElement.blur();
+});
+let resetArmed = 0;
+$('#s-reset').addEventListener('click', () => {
+  if (readOnly) return;
+  const now = Date.now();
+  if (now - resetArmed < 6000) { resetArmed = 0; $('#s-reset').textContent = 'Reset progress'; resetAll(); toast('Progress cleared. Settings kept.'); return; }
+  resetArmed = now; $('#s-reset').textContent = 'Tap again to erase every tap and boost'; setTimeout(() => { if (Date.now() - resetArmed >= 6000) $('#s-reset').textContent = 'Reset progress'; }, 6200);
+});
+setInterval(() => { refresh(); }, 60 * 1000 * 15); // roll "today" forward without a reload
+
+/* ---------- boot ---------- */
+buildAll();
+initStore();
+})();
+</script>
+
+</body>
+</html>
